@@ -11,6 +11,7 @@
   </head>
     <body>
       <h1>Randomize IP address</h1>
+
       <script src="http://code.jquery.com/jquery.js"></script>
 
       <form class="navbar-form pull-right">
@@ -24,6 +25,12 @@
     <div id="detailArea"></div>
 
     </div> <!-- /container -->
+
+
+      <h2>Thanks to the <a href="https://freegeoip.net">Freegeoip.net project</a> and webservice!</h2>
+<p>Note: Not every IP address can be resolved to a zipcode, please do view this shource on this page to understand that we are using the first quadrant of the IP address in that case.</p>
+
+<p>Note: This example is making a binary decision appropriate for A/B testing, but the function ChooseClass can be used to choose any (small) number of cohorts.</p>
 
     </body>
   </html>
@@ -48,10 +55,9 @@ function performSearch() {
       alert("Please enter an ip address.");
       return;
     }
+    alert("ipAddress "+ipAddress);
     lookupAndRender(ipAddress);
 }
-
-
 
 // NOTE: the function chooseClass must not change during the course of the 
 // experiment.  Also, it must be easily computable from the IP address (or
@@ -87,12 +93,14 @@ function lookupAndRender(ipAddress) {
 }
 
 function processAjaxSearch(data) {
+    alert("data "+data);
     var zip = data.zipcode; 
     var ip = data.ip; 
     var cohort = chooseClass(2,data); 
 
     var detailAreaDiv = $("#"+'detailArea');
     detailAreaDiv.empty();
+    alert("appending ");
     detailAreaDiv.append(renderLocationData(ip,zip,cohort));
 }
 
