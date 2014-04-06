@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+  <html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Randomize IP Based on Zipcode Based on Geolocation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+  </head>
+    <body>
+      <h1>Randomize IP address</h1>
+      <script src="http://code.jquery.com/jquery.js"></script>
+
+      <form class="navbar-form pull-right">
+         <input id="small_search_string" class="span2" type="text" placeholder="IP Address">
+         <input type="button" id="searchButton" value="Search" onclick="performSearch();">
+       </form>
+
+    <div class="container">
+
+<!-- Will put Ajax results here -->
+    <div id="detailArea"></div>
+
+    </div> <!-- /container -->
+
+    </body>
+  </html>
+
+<script>
+
+function renderLocationData(ip,zip,cohort) {
+	var html = "";
+	html +=      ' <div class="result">';
+	html +=      '<div>zip = '+ zip + ' </div>'; 
+	html +=      '<div>ip = '+ ip + ' </div>'; 
+	html +=      '<div>binary cohort = '+ cohort + ' </div>'; 
+	html +=      '</div>';
+        return html;
+}
+var freegeoip = "https://freegeoip.net/json";
+
+
+function performSearch() {
+    var ipAddress = $('#small_search_string').val();
+    if (ipAddress.length == 0) {
+      alert("Please enter an ip address.");
+      return;
+    }
+    lookupAndRender(ipAddress);
+}
+
+
+
+// NOTE: the function chooseClass must not change during the course of the 
+// experiment.  Also, it must be easily computable from the IP address (or
+// somthng easily computable from the IP address, like the zipcode, as this
+// file demonstrates.)
+
+// We want to use the zipcode, but if we can't get that we will 
+// use the first digit of the ip address, because often the zipcodes are missing.
+function chooseClass(numClasses,data) {
+    var zip = data.zipcode;
+    var i = parseInt(zip);
+    if (isNaN(i)) {
+// This is a trick---javacript will read up to the first dot, 
+// so this returns the value of the first byte--a hero would clarify this.
+	i = parseInt(data.ip);
+    }
+    return i % numClasses;
+}
+
+function lookupAndRender(ipAddress) {
+   $.ajax({
+    type: 'GET',
+    url: freegeoip+"/"+ipAddress,
+    async: false,
+    jsonpCallback: 'processAjaxSearch',
+    contentType: "application/json",
+    dataType: 'jsonp',
+    error: function(e) {
+       alert("e.message = "+e.message);
+       console.log(e.message);
+    }
+  });
+}
+
+function processAjaxSearch(data) {
+    var zip = data.zipcode; 
+    var ip = data.ip; 
+    var cohort = chooseClass(2,data); 
+
+    var detailAreaDiv = $("#"+'detailArea');
+    detailAreaDiv.empty();
+    detailAreaDiv.append(renderLocationData(ip,zip,cohort));
+}
+
+</script>
