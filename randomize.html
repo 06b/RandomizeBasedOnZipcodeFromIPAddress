@@ -37,9 +37,10 @@
 
 <script>
 
-function renderLocationData(ip,zip,cohort) {
+function renderLocationData(ip,zip,state,cohort) {
 	var html = "";
 	html +=      ' <div class="result">';
+	html +=      '<div>state = '+ state + ' </div>'; 
 	html +=      '<div>zip = '+ zip + ' </div>'; 
 	html +=      '<div>ip = '+ ip + ' </div>'; 
 	html +=      '<div>binary cohort = '+ cohort + ' </div>'; 
@@ -76,6 +77,89 @@ function chooseClass(numClasses,data) {
     }
     return i % numClasses;
 }
+// This is simple as pie, I'm just using a table-driven split 
+// into two groups based on actual GSA data --- this is not even optimized, though
+// it is within a few percent.
+
+var Group0States = [
+'TX',   //	27,004
+'VA',   //	12,030
+'AL',   //	9,128
+'LA',   //	8,720
+'NY',   //	7,953
+'MS',   //	7,889
+'MO',   //	7,651
+'OR',   //	7,590
+'PA',   //	7,082
+'MI',   //	6,259
+'WV',   //	3,005
+'AZ',   //	5,506
+'TN',   //	5,094
+'AK',   //	4,479
+'WI',   //	4,460
+'KY',   //	4,283
+'UT',   //	3,733
+'KS',   //	3,302
+'MA',   //	3,193
+'NE',   //	2,821
+'NM',   //	2,601
+'ND',   //	2,266
+'WY',   //	1,843
+'NH',   //	997
+'ME',   //	925
+'RI',   //	499
+'DE',   //	497
+'GU',   //	342
+'BC',   //	251
+'QC',   //	133
+'AB',   //	133
+'SK',   //	38
+'UM'   //	31
+]
+
+var Group1States = [
+'CA',   //	23,068
+'FL',   //	22,062
+'GA',   //	10,038
+'WA',   //	8,561
+'MD',   //	7,981
+'CO',   //	7,794
+'OH',   //	7,661
+'IL',   //	7,331
+'AR',   //	7,229
+'NC',   //	6,078
+'OK',   //	5,650
+'MN',   //	4,712
+'SC',   //	4,518
+'IN',   //	4,368
+'MT',   //	4,305
+'NJ',   //	3,730
+'ID',   //	3,339
+'IA',   //	2,875
+'NV',   //	2,437
+'SD',   //	2,311
+'HI',   //	1,735
+'CT',   //	1,410
+'DC',   //	680
+'PR',   //	659
+'VT',   //	393
+'ON',   //	372
+'VI',   //	219
+'AE',   //	137
+'AP',   //	76
+'MB',   //	64
+'NS',   //	19
+'NB'   //	18
+]
+
+function chooseClassFromPopulationData(data) {
+    var state = data.region_code;
+    if (Group0States.indexOf(state) > -1) {
+         return 0;
+    } else {
+         return 1;
+    }
+}
 
 function lookupAndRender(ipAddress) {
    $.ajax({
@@ -93,15 +177,15 @@ function lookupAndRender(ipAddress) {
 }
 
 function processAjaxSearch(data) {
-    alert("data "+data);
     var zip = data.zipcode; 
+    var state = data.region_code;
     var ip = data.ip; 
-    var cohort = chooseClass(2,data); 
+//    var cohort = chooseClass(2,data); 
+    var cohort = chooseClassFromPopulationData(data); 
 
     var detailAreaDiv = $("#"+'detailArea');
     detailAreaDiv.empty();
-    alert("appending ");
-    detailAreaDiv.append(renderLocationData(ip,zip,cohort));
+    detailAreaDiv.append(renderLocationData(ip,zip,state,cohort));
 }
 
 </script>
